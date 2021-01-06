@@ -105,6 +105,7 @@ while KeyboardInterrupt:
 #            #dev.reboot()
     else:
         minute_counter += 1
+    ui.set_progress((minute_counter / weather_check_interval))
     ui.set_countdown(str(minute_counter))
     collect()
     time.sleep(0.2)

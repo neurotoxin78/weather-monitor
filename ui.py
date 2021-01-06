@@ -6,8 +6,8 @@ from adafruit_display_text import label
 from adafruit_display_shapes.rect import Rect
 from adafruit_display_shapes.roundrect import RoundRect
 from adafruit_display_shapes.sparkline import Sparkline
+from adafruit_progressbar import ProgressBar
 from adafruit_bitmap_font import bitmap_font
-import adafruit_imageload
 import adafruit_logging as logging
 logger = logging.getLogger('UI')
 logger.setLevel(logging.INFO)
@@ -17,14 +17,14 @@ class UI(object):
         # themes
         self.theme = theme
         # Fonts
-        self.font_mini = terminalio.FONT
+        self.font_default = terminalio.FONT
+        self.font_micro = bitmap_font.load_font("fonts/font-6.bdf")
+        self.font_mini = bitmap_font.load_font("fonts/font-8.bdf")
         self.font_middle = bitmap_font.load_font("fonts/font-middle.bdf")
-        self.font_big = bitmap_font.load_font("fonts/font-big.bdf")
-        self.font_verybig = bitmap_font.load_font("/sd/fonts/font-verybig.bdf")
+        self.font_big = bitmap_font.load_font("/sd/fonts/font-big.bdf")
         self.icons_12 = bitmap_font.load_font("fonts/awesome_icons-12.bdf")
         self.icons_16 = bitmap_font.load_font("fonts/awesome_icons-16.bdf")
-        self.icons_8 = bitmap_font.load_font("fonts/awesome_icons-8.bdf")
-        self.icons_10 = bitmap_font.load_font("fonts/awesome_icons-10.bdf")
+
         displayio.release_displays()
         # Display init
         spi = busio.SPI(clock=board.LCD_CLK, MOSI=board.LCD_MOSI, MISO=board.LCD_MISO)
@@ -75,6 +75,7 @@ class UI(object):
         self._bme_values()
         self._weather_values()
         self._status_bar()
+        self._progress_bar()
         self._sparkline()
         self.show_ui()
         logger.info('UI Initialising ...')
@@ -107,8 +108,15 @@ class UI(object):
         self.main_group.append(self.press_min_value)
         self.main_group.append(self.sys_stat_label)
         self.main_group.append(self.ip_label)
+        self.main_group.append(self.progress_bar)
         self.main_group.append(self.countdown_label)
         logger.info('show labels')
+
+    def _progress_bar(self):
+        self.progress_bar = ProgressBar(0, 210, 320, 6, 0.0, bar_color=self.theme['top_panel'], outline_color=self.theme['background'])
+
+    def set_progress(self, progress):
+        self.progress_bar.progress = progress
 
     def _sparkline(self):
         # Baseline size of the sparkline chart, in pixels.
@@ -135,10 +143,10 @@ class UI(object):
     def _weather_values(self):
         value_y = 60
         # Out Temp
-        self.out_temp = label.Label(self.font_big, text='+20 ' + chr(0176), color=self.theme['text_color'])
+        self.out_temp = label.Label(self.font_middle, text='+20 ' + chr(0176), color=self.theme['text_color'])
         self.out_temp.x = 210
         self.out_temp.y = 25
-        self.out_temp.scale = 1
+        self.out_temp.scale = 2
         self.out_temp.anchor_point = (1, 0.5)
 
         # Feels like
@@ -224,7 +232,7 @@ class UI(object):
         self.ip_label.y = label_y
         self.ip_label.scale = 1
 
-        self.countdown_label = label.Label(self.font_mini, text='0000     ', color=self.theme['counter'])
+        self.countdown_label = label.Label(self.font_micro, text='0000     ', color=self.theme['counter'])
         self.countdown_label.x = 290
         self.countdown_label.y = label_y
         self.countdown_label.scale = 1
