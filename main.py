@@ -7,12 +7,15 @@ from ui import UI
 from devices import Devices
 import random
 import adafruit_logging as logging
+from themes import *
+import supervisor as s
+s.disable_autoreload()
+
 logger = logging.getLogger('main')
 logger.setLevel(logging.INFO)
 time.sleep(3)
 # Devices
 dev = Devices()
-#dev.power_on()
 #WiFi
 ssid = "Neurotoxin2"
 passwd = "Mxbb2Col"
@@ -20,24 +23,27 @@ try:
     dev.connect(ssid, passwd)
 except:
     pass
-
+#dev.ntptime()
 # Variables
 o_temp = 0
 o_humi = 0
 o_press = 0
 o_alt = 0
 # UI
+theme = dark
 fg_color = 0xFFFFFF
-bg_color = 0x252525
-ui = UI()
+bg_color = 0x25252
+ui = UI(theme)
 ui.main_screen(fg_color, bg_color)
 collect()
 time.sleep(3)
+# contrs and interals
 try_count = 0
 weather_check_interval = 7200
 minute_counter = weather_check_interval
 graph_step = 100
 graph_counter = graph_step
+
 def degrees_to_cardinal(d):
     '''
     note: this is highly approximate...
@@ -79,7 +85,7 @@ while KeyboardInterrupt:
             logger.info('add to graphics ' + str(press))
             graph_counter = 0
         else:
-            graph_counter = graph_counter + 1
+            graph_counter +=  1
         if temp != o_temp or humi != o_humi or press != o_press:
             ui.set_bme_values(temp, humi, press)
             o_temp, o_humi, o_press = temp, humi, press
@@ -93,12 +99,12 @@ while KeyboardInterrupt:
             minute_counter = 0
         else:
             minute_counter = weather_check_interval - 30
-            try_count = try_count + 1
+            try_count += 1
 #        if try_count == 5:
 #            pass
 #            #dev.reboot()
     else:
-        minute_counter = minute_counter + 1
+        minute_counter += 1
     ui.set_countdown(str(minute_counter))
     collect()
     time.sleep(0.2)

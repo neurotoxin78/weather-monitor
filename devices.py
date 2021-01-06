@@ -10,6 +10,7 @@ import digitalio
 import sdcardio
 import storage
 import adafruit_logging as logging
+import rtc
 logger = logging.getLogger('devices')
 logger.setLevel(logging.INFO)
 
@@ -52,6 +53,18 @@ class Devices(object):
         self.pool = socketpool.SocketPool(wifi.radio)
         self.request = adafruit_requests.Session(self.pool, ssl.create_default_context())
         logger.info('Wi-Fi connected')
+
+    def ntptime(self):
+        response = self.request.get("http://worldclockapi.com/api/json/est/now")
+        if response.status_code == 200:
+            r = rtc.RTC()
+            r.datetime = time.localtime(response.json()['currentFileTime'])
+            print(f"System Time: {r.datetime}")
+            logger.error(f"System Time: {r.datetime}")
+        else:
+            print("Setting time failed")
+            logger.error('Setting time faled')
+
     def get_ip(self):
         return wifi.radio.ipv4_address
     def get_weather(self):
