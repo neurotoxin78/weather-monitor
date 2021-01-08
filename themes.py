@@ -14,15 +14,15 @@ default = {
 }
 
 dark = {
-'background' : 0x0E141D,
-'top_panel' : 0x5678B8,
-'bottom_panel' : 0x5678B8,
+'background' : 0x002b36,
+'top_panel' : 0x004b5f,
+'bottom_panel' : 0x004b5f,
 'top_panel_text' : 0xE9EEF7,
 'spark_line' : 0xE9EEF7,
-'graphic_background' : 0x141D2F,
+'graphic_background' : 0x001f27 ,
 'text_color' : 0xE9EEF7,
 "bottom_panel_text" : 0xE9EEF7,
-'mem_free_label' : 0x0E141D,
-'ip_label' : 0x0E141D,
-'counter' : 0x0E141D,
+'mem_free_label' : 0xE9EEF7,
+'ip_label' : 0xE9EEF7,
+'counter' : 0xE9EEF7,
 }

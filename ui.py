@@ -20,8 +20,10 @@ class UI(object):
         self.font_default = terminalio.FONT
         self.font_micro = bitmap_font.load_font("fonts/font-6.bdf")
         self.font_mini = bitmap_font.load_font("fonts/font-8.bdf")
+        self.font_normal = bitmap_font.load_font("fonts/font-12.bdf")
         self.font_middle = bitmap_font.load_font("fonts/font-middle.bdf")
         self.font_big = bitmap_font.load_font("/sd/fonts/font-big.bdf")
+        self.icons_10 = bitmap_font.load_font("fonts/awesome_icons-10.bdf")
         self.icons_12 = bitmap_font.load_font("fonts/awesome_icons-12.bdf")
         self.icons_16 = bitmap_font.load_font("fonts/awesome_icons-16.bdf")
 
@@ -65,7 +67,7 @@ class UI(object):
         self.display.rotation = 0
         logger.info('Display initialized')
 
-    def main_screen(self, fg_color, bg_color):
+    def main_screen(self):
         # UI
         _round = 10
         self.main_group = displayio.Group(max_size=25)
@@ -77,22 +79,22 @@ class UI(object):
         self._status_bar()
         self._progress_bar()
         self._sparkline()
+        self._clock()
         self.show_ui()
         logger.info('UI Initialising ...')
 
     def _background(self):
         self.background = Rect(0, 0, 320, 240, fill=self.theme['background'])
-        self.bme_panel = RoundRect(6, 6, 130, 40, 6, fill=self.theme['top_panel'], stroke=6)
-        #self.bme_panel_shadow = RoundRect(8, 8, 140, 40, 5, fill=0x091834, stroke=6)
-        self.border_panel = RoundRect(6, 75, 308, 4, 2, fill=self.theme['top_panel'], stroke=6)
-        #self.border_panel_shadow = RoundRect(8, 77, 308, 5, 2, fill=0x091834, stroke=6)
+        self.border_panel = Rect(6, 65, 308, 3, fill=self.theme['top_panel'], stroke=6)
+        self.border_panel_next = Rect(6, 120, 308, 3, fill=self.theme['top_panel'], stroke=6)
         self.status_panel = Rect(0, 216, 320, 24, fill=self.theme['bottom_panel'])
         logger.info('make background')
 
     def show_ui(self):
         self.main_group.append(self.background)
-        self.main_group.append(self.bme_panel)
+        #self.main_group.append(self.bme_panel)
         self.main_group.append(self.border_panel)
+        self.main_group.append(self.border_panel_next)
         self.main_group.append(self.status_panel)
         self.main_group.append(self.temp_value)
         self.main_group.append(self.humi_value)
@@ -110,21 +112,31 @@ class UI(object):
         self.main_group.append(self.ip_label)
         self.main_group.append(self.progress_bar)
         self.main_group.append(self.countdown_label)
+        self.main_group.append(self.clock_label)
         logger.info('show labels')
 
+    def _clock(self):
+        self.clock_label = label.Label(self.font_middle, text='00:00                               ' + chr(0176), color=self.theme['text_color'])
+        self.clock_label.x = 130
+        self.clock_label.y = 228
+        self.clock_label.scale = 1
+        self.clock_label.anchor_point = (1, 0.5)
+
     def _progress_bar(self):
-        self.progress_bar = ProgressBar(0, 210, 320, 6, 0.0, bar_color=self.theme['top_panel'], outline_color=self.theme['background'])
+        self.progress_bar = ProgressBar(0, 210, 320, 6, 0.0, bar_color=self.theme['top_panel'], outline_color=self.theme['background'], stroke=4)
+        #self.progress_bar.fill = self.theme['background']
 
     def set_progress(self, progress):
         self.progress_bar.progress = progress
 
     def _sparkline(self):
-        # Baseline size of the sparkline chart, in pixels.
         chart_width = 200
-        chart_height = 50
+        chart_height = 40
+        x = 10
+        y = 74
         line_color = self.theme['spark_line']
-        self.sparkline = Sparkline(width=chart_width, height=chart_height, max_items=chart_width, x=10, y=88, color=line_color,)
-        self.bounding_rectangle = RoundRect(self.sparkline.x - 3, self.sparkline.y - 3, chart_width + 6, chart_height + 6, 10, fill=self.theme['graphic_background'], outline=self.theme['graphic_background'])
+        self.sparkline = Sparkline(width=chart_width, height=chart_height, max_items=chart_width, x=x, y=y, color=line_color,)
+        self.bounding_rectangle = Rect(self.sparkline.x - 3, self.sparkline.y - 3, chart_width + 6, chart_height + 6, fill=self.theme['graphic_background'], outline=self.theme['graphic_background'])
         logger.info('create graphic')
 
     def add_graphic_value(self, x):
@@ -141,67 +153,67 @@ class UI(object):
 
 
     def _weather_values(self):
-        value_y = 60
+        value_y = 52
         # Out Temp
-        self.out_temp = label.Label(self.font_middle, text='+20 ' + chr(0176), color=self.theme['text_color'])
+        self.out_temp = label.Label(self.font_big, text='+20 ' + chr(0176), color=self.theme['text_color'])
         self.out_temp.x = 210
         self.out_temp.y = 25
-        self.out_temp.scale = 2
+        self.out_temp.scale = 1
         self.out_temp.anchor_point = (1, 0.5)
 
         # Feels like
         self.feels = label.Label(self.font_middle, text='??  ' + chr(0176), color=self.theme['text_color'])
         self.feels.x = 154
-        self.feels.y = 14
+        self.feels.y = 12
         self.feels.scale = 1
 
         # Wind Speed
-        self.wind = label.Label(self.font_middle, text='??       ', color=self.theme['text_color'])
+        self.wind = label.Label(self.font_normal, text='??       ', color=self.theme['text_color'])
         self.wind.x = 30
         self.wind.y = value_y
         self.wind.scale = 1
         # Wind icon
-        self.wind_icon = label.Label(self.icons_12, text='G', color=self.theme['text_color'])
+        self.wind_icon = label.Label(self.icons_10, text='G', color=self.theme['text_color'])
         self.wind_icon.x = 8
         self.wind_icon.y = value_y + 6
 
         # Humidity
         self.out_humi = label.Label(self.font_middle, text='100%  ', color=self.theme['text_color'])
         self.out_humi.x = 150
-        self.out_humi.y = 35
+        self.out_humi.y = 33
         self.out_humi.scale = 1
 
         # Weather Description Value
-        self.we_desc_value = label.Label(self.font_middle, text='weather description                                   ', color=self.theme['text_color'])
+        self.we_desc_value = label.Label(self.font_normal, text='weather description                                   ', color=self.theme['text_color'])
         self.we_desc_value.x = 150
         self.we_desc_value.y = value_y
         self.we_desc_value.scale = 1
         logger.info('make weather labels')
 
     def _bme_values(self):
-        value_y = 34
+        value_y = 20
         # Values Labels
         # Temp Value
         self.temp_value = label.Label(self.icons_16, text='D20' + chr(0176), color=self.theme['text_color'])
-        self.temp_value.x = 14
+        self.temp_value.x = 5
         self.temp_value.y = value_y
         self.temp_value.scale = 1
 
         # Humidity Value
         self.humi_value = label.Label(self.icons_16, text="E100" + chr(0x25), color=self.theme['text_color'])
-        self.humi_value.x = 70
+        self.humi_value.x = 62
         self.humi_value.y = value_y
         self.humi_value.scale = 1
 
         # Pressure Value
         self.press_value = label.Label(self.icons_16, text="F000      ", color=self.theme['text_color'])
         self.press_value.x = 248
-        self.press_value.y = 118
+        self.press_value.y = 102
         self.press_value.scale = 1
         # Pesure min value
         self.press_min_value = label.Label(self.icons_16, text="    ", color=self.theme['text_color'])
         self.press_min_value.x = 222
-        self.press_min_value.y = 120
+        self.press_min_value.y = 105
         self.press_min_value.scale = 1
         logger.info('make sensor label')
 
@@ -223,16 +235,16 @@ class UI(object):
     def _status_bar(self):
         label_y = 228
         self.sys_stat_label = label.Label(self.font_mini, text='RAM:         ', color=self.theme['mem_free_label'])
-        self.sys_stat_label.x = 10
+        self.sys_stat_label.x = 6
         self.sys_stat_label.y = label_y
         self.sys_stat_label.scale = 1
 
         self.ip_label = label.Label(self.font_mini, text='IP:            ', color=self.theme['ip_label'])
-        self.ip_label.x = 145
+        self.ip_label.x = 200
         self.ip_label.y = label_y
         self.ip_label.scale = 1
 
-        self.countdown_label = label.Label(self.font_micro, text='0000     ', color=self.theme['counter'])
+        self.countdown_label = label.Label(self.font_mini, text='0000     ', color=self.theme['counter'])
         self.countdown_label.x = 290
         self.countdown_label.y = label_y
         self.countdown_label.scale = 1
@@ -244,3 +256,5 @@ class UI(object):
         self.ip_label._update_text(ip)
     def set_countdown(self, count):
         self.countdown_label._update_text(count)
+    def set_clock(self, time):
+        self.clock_label._update_text(str(time))

@@ -10,7 +10,7 @@ import digitalio
 import sdcardio
 import storage
 import adafruit_logging as logging
-import rtc
+import rtc, time
 logger = logging.getLogger('devices')
 logger.setLevel(logging.INFO)
 
@@ -38,6 +38,9 @@ class Devices(object):
         vfs = storage.VfsFat(sd)
         storage.mount(vfs, '/sd')
         logger.info('SD Card initialized and mount /sd')
+        # RTC
+        self.clock = rtc.RTC()
+        logger.info('RTC Initialized')
 
     def sd_power_on(self):
         self.pwr_pin.value = 1
@@ -53,6 +56,16 @@ class Devices(object):
         self.pool = socketpool.SocketPool(wifi.radio)
         self.request = adafruit_requests.Session(self.pool, ssl.create_default_context())
         logger.info('Wi-Fi connected')
+        response = self.request.get("http://worldtimeapi.org/api/timezone/Europe/Kiev")
+        print(response.json())
+        try:
+            self.clock.datetime = time.localtime(response.json()['unixtime'])
+            logger.info(self.clock.datetime)
+        except:
+            logger.error('Setting time faled')
+
+    def get_datetime(self):
+        return self.clock.datetime
 
     def ntptime(self):
         response = self.request.get("http://worldclockapi.com/api/json/est/now")
@@ -60,7 +73,7 @@ class Devices(object):
             r = rtc.RTC()
             r.datetime = time.localtime(response.json()['currentFileTime'])
             print(f"System Time: {r.datetime}")
-            logger.error(f"System Time: {r.datetime}")
+            logger.info(f"System Time: {r.datetime}")
         else:
             print("Setting time failed")
             logger.error('Setting time faled')

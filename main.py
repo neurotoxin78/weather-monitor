@@ -34,10 +34,10 @@ theme = dark
 fg_color = 0xFFFFFF
 bg_color = 0x25252
 ui = UI(theme)
-ui.main_screen(fg_color, bg_color)
+ui.main_screen()
 collect()
 time.sleep(3)
-# contrs and interals
+# contrs and intervals
 try_count = 0
 weather_check_interval = 7200
 minute_counter = weather_check_interval
@@ -48,8 +48,10 @@ def degrees_to_cardinal(d):
     '''
     note: this is highly approximate...
     '''
-    dirs = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",
-            "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"]
+    #dirs = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",
+    #            "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"]
+    dirs = ["Пн", "ПнПнСх", "ПнСх", "СхПнСх", "Сх", "СхПдСх", "ПдСх", "ПдПдСх",
+            "Пд", "ПдПдЗх", "ПдЗх", "ЗхПдЗх", "Зх", "ЗхПнЗх", "ПнЗх", "ПнПнЗх"]
     ix = int((d + 11.25)/22.5)
     return dirs[ix % 16]
 
@@ -75,7 +77,7 @@ def set_weather(data):
 # Main Loop
 logger.info('Start main loop')
 while KeyboardInterrupt:
-    ui.set_sys_stat("RAM:" + str(mem_free()) + "b")
+    ui.set_sys_stat("RAM:" + str(round(mem_free() / 1024 / 1024, 2)) + "Mb")
     ui.set_ip_stat('IP:' + str(dev.get_ip()))
     try:
         temp, humi, press = dev.get_temperature(), dev.get_humidity(), dev.get_pressure()
@@ -107,5 +109,7 @@ while KeyboardInterrupt:
         minute_counter += 1
     ui.set_progress((minute_counter / weather_check_interval))
     ui.set_countdown(str(minute_counter))
+    date_time = dev.get_datetime()
+    ui.set_clock("{:0>2}".format(date_time[3] + 2) + ":{:0>2}".format(date_time[4]))
     collect()
     time.sleep(0.2)
