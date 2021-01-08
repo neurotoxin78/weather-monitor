@@ -20,7 +20,7 @@ class UI(object):
         self.font_default = terminalio.FONT
         self.font_micro = bitmap_font.load_font("fonts/font-6.bdf")
         self.font_mini = bitmap_font.load_font("fonts/font-8.bdf")
-        self.font_normal = bitmap_font.load_font("fonts/font-12.bdf")
+        self.font_normal = bitmap_font.load_font("/sd/fonts/font-14.bdf")
         self.font_middle = bitmap_font.load_font("fonts/font-middle.bdf")
         self.font_big = bitmap_font.load_font("/sd/fonts/font-big.bdf")
         self.icons_10 = bitmap_font.load_font("fonts/awesome_icons-10.bdf")
@@ -116,11 +116,7 @@ class UI(object):
         logger.info('show labels')
 
     def _clock(self):
-        self.clock_label = label.Label(self.font_middle, text='00:00                               ' + chr(0176), color=self.theme['text_color'])
-        self.clock_label.x = 130
-        self.clock_label.y = 228
-        self.clock_label.scale = 1
-        self.clock_label.anchor_point = (1, 0.5)
+        self.clock_label = label.Label(self.font_middle, x=135, y=228, text='00:00       ' + chr(0176), color=self.theme['clock'])
 
     def _progress_bar(self):
         self.progress_bar = ProgressBar(0, 210, 320, 6, 0.0, bar_color=self.theme['top_panel'], outline_color=self.theme['background'], stroke=4)
@@ -155,66 +151,30 @@ class UI(object):
     def _weather_values(self):
         value_y = 52
         # Out Temp
-        self.out_temp = label.Label(self.font_big, text='+20 ' + chr(0176), color=self.theme['text_color'])
-        self.out_temp.x = 210
-        self.out_temp.y = 25
-        self.out_temp.scale = 1
-        self.out_temp.anchor_point = (1, 0.5)
-
+        self.out_temp = label.Label(self.font_big, x= 206, y=24, text='+20 ' + chr(0176), color=self.theme['temp_color'])
         # Feels like
-        self.feels = label.Label(self.font_middle, text='??  ' + chr(0176), color=self.theme['text_color'])
-        self.feels.x = 154
-        self.feels.y = 12
-        self.feels.scale = 1
-
+        self.feels = label.Label(self.font_middle, x=150, y=12, text='??  ' + chr(0176), color=self.theme['text_color'])
         # Wind Speed
-        self.wind = label.Label(self.font_normal, text='??       ', color=self.theme['text_color'])
-        self.wind.x = 30
-        self.wind.y = value_y
-        self.wind.scale = 1
+        self.wind = label.Label(self.font_normal, x=26, y=value_y, text='??       ', color=self.theme['wind_color'])
         # Wind icon
-        self.wind_icon = label.Label(self.icons_10, text='G', color=self.theme['text_color'])
-        self.wind_icon.x = 8
-        self.wind_icon.y = value_y + 6
-
+        self.wind_icon = label.Label(self.icons_10, x=5, y= value_y + 6, text='G', color=self.theme['wind_color'])
         # Humidity
-        self.out_humi = label.Label(self.font_middle, text='100%  ', color=self.theme['text_color'])
-        self.out_humi.x = 150
-        self.out_humi.y = 33
-        self.out_humi.scale = 1
-
+        self.out_humi = label.Label(self.font_middle,x=145, y=33, text='100%  ', color=self.theme['humi_color'])
         # Weather Description Value
-        self.we_desc_value = label.Label(self.font_normal, text='weather description                                   ', color=self.theme['text_color'])
-        self.we_desc_value.x = 150
-        self.we_desc_value.y = value_y
-        self.we_desc_value.scale = 1
+        self.we_desc_value = label.Label(self.font_normal,x = 145, y=value_y, text='weather description                                   ', color=self.theme['description_color'])
         logger.info('make weather labels')
 
     def _bme_values(self):
         value_y = 20
         # Values Labels
         # Temp Value
-        self.temp_value = label.Label(self.icons_16, text='D20' + chr(0176), color=self.theme['text_color'])
-        self.temp_value.x = 5
-        self.temp_value.y = value_y
-        self.temp_value.scale = 1
-
+        self.temp_value = label.Label(self.icons_16, x=5, y=value_y, text='D20' + chr(0176), color=self.theme['temp_color'])
         # Humidity Value
-        self.humi_value = label.Label(self.icons_16, text="E100" + chr(0x25), color=self.theme['text_color'])
-        self.humi_value.x = 62
-        self.humi_value.y = value_y
-        self.humi_value.scale = 1
-
+        self.humi_value = label.Label(self.icons_16, x=62, y=value_y, text="E100" + chr(0x25), color=self.theme['humi_color'])
         # Pressure Value
-        self.press_value = label.Label(self.icons_16, text="F000      ", color=self.theme['text_color'])
-        self.press_value.x = 248
-        self.press_value.y = 102
-        self.press_value.scale = 1
+        self.press_value = label.Label(self.icons_16, x=248, y=102, text="F000      ", color=self.theme['press_color'])
         # Pesure min value
-        self.press_min_value = label.Label(self.icons_16, text="    ", color=self.theme['text_color'])
-        self.press_min_value.x = 222
-        self.press_min_value.y = 105
-        self.press_min_value.scale = 1
+        self.press_min_value = label.Label(self.icons_16, x=222, y=105, text="    ", color=self.theme['press_color'])
         logger.info('make sensor label')
 
     def set_bme_values(self, temp, humi, press):
@@ -229,25 +189,14 @@ class UI(object):
     def set_outside_humidity(self, humi):
         self.out_humi._update_text(str(humi) + '%')
     def set_wind(self, speed, direction):
-        self.wind._update_text(str(speed) + 'm/s ' + direction)
+        self.wind._update_text(str(speed) + 'm\s ' + direction)
     def set_we_desc(self, desc):
         self.we_desc_value._update_text(str(desc))
     def _status_bar(self):
         label_y = 228
-        self.sys_stat_label = label.Label(self.font_mini, text='RAM:         ', color=self.theme['mem_free_label'])
-        self.sys_stat_label.x = 6
-        self.sys_stat_label.y = label_y
-        self.sys_stat_label.scale = 1
-
-        self.ip_label = label.Label(self.font_mini, text='IP:            ', color=self.theme['ip_label'])
-        self.ip_label.x = 200
-        self.ip_label.y = label_y
-        self.ip_label.scale = 1
-
-        self.countdown_label = label.Label(self.font_mini, text='0000     ', color=self.theme['counter'])
-        self.countdown_label.x = 290
-        self.countdown_label.y = label_y
-        self.countdown_label.scale = 1
+        self.sys_stat_label = label.Label(self.font_mini, x=6, y=label_y, text='RAM:         ', color=self.theme['mem_free_label'])
+        self.ip_label = label.Label(self.font_mini,x=200, y=label_y, text='IP:            ', color=self.theme['ip_label'])
+        self.countdown_label = label.Label(self.font_mini, x=290, y=label_y, text='0000     ', color=self.theme['counter'])
         logger.info('make status panel')
 
     def set_sys_stat(self, sys_stat):

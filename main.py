@@ -31,8 +31,6 @@ o_press = 0
 o_alt = 0
 # UI
 theme = dark
-fg_color = 0xFFFFFF
-bg_color = 0x25252
 ui = UI(theme)
 ui.main_screen()
 collect()
@@ -48,10 +46,10 @@ def degrees_to_cardinal(d):
     '''
     note: this is highly approximate...
     '''
-    #dirs = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",
-    #            "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"]
-    dirs = ["Пн", "ПнПнСх", "ПнСх", "СхПнСх", "Сх", "СхПдСх", "ПдСх", "ПдПдСх",
-            "Пд", "ПдПдЗх", "ПдЗх", "ЗхПдЗх", "Зх", "ЗхПнЗх", "ПнЗх", "ПнПнЗх"]
+    dirs = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",
+                "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"]
+    #dirs = ["Пн", "ПнПнСх", "ПнСх", "СхПнСх", "Сх", "СхПдСх", "ПдСх", "ПдПдСх",
+    #        "Пд", "ПдПдЗх", "ПдЗх", "ЗхПдЗх", "Зх", "ЗхПнЗх", "ПнЗх", "ПнПнЗх"]
     ix = int((d + 11.25)/22.5)
     return dirs[ix % 16]
 
