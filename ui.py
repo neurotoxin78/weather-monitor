@@ -159,9 +159,9 @@ class UI(object):
     def _forecast_values(self):
         # Forecast Date
         self.forecast_date = label.Label(self.font_normal, x=1, y=134, text='tomorrow         ', color=self.theme['forecast_date'])
-        self.forecast_temp = label.Label(self.icons_16, x=106, y=134, text='d0 n+5             ', color=self.theme['forecast_temp'])
+        self.forecast_temp = label.Label(self.icons_14, x=104, y=134, text='d0 n+5             ', color=self.theme['forecast_temp'])
         self.forecast_wind = label.Label(self.icons_14, x=5, y=160, text='G 1m/s NNE          ', color=self.theme['forecast_wind'])
-        self.forecast_press_and_humi = label.Label(self.icons_16, x=215, y=134, text='F755          ', color=self.theme['forecast_press_and_humi'])
+        self.forecast_press_and_humi = label.Label(self.icons_14, x=215, y=134, text='F755          ', color=self.theme['forecast_press_and_humi'])
         self.forecast_desc = label.Label(self.font_normal, x=120, y=157, text='forecast description             ', color=self.theme['forecast_description'])
     def _weather_values(self):
         value_y = 50
