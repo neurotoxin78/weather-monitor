@@ -30,9 +30,9 @@ class Devices(object):
         logger.info('BME280 sensor configured')
         self.pwr_pin = digitalio.DigitalInOut(board.IO14)
         self.pwr_pin.direction = digitalio.Direction.OUTPUT
-        logger.info('power pin configured')
+        logger.info('Power pin configured')
         #SD
-        self.sd_power_on()
+        #self.sd_power_on()
         spi = busio.SPI(clock=board.SD_CLK, MOSI=board.SD_MOSI, MISO=board.SD_MISO)
         sd = sdcardio.SDCard(spi, board.SD_CS)
         vfs = storage.VfsFat(sd)
@@ -57,26 +57,14 @@ class Devices(object):
         self.request = adafruit_requests.Session(self.pool, ssl.create_default_context())
         logger.info('Wi-Fi connected')
         response = self.request.get("http://worldtimeapi.org/api/timezone/Europe/Kiev")
-        print(response.json())
         try:
             self.clock.datetime = time.localtime(response.json()['unixtime'])
-            logger.info(self.clock.datetime)
+            logger.info('Time Sync Success')
         except:
             logger.error('Setting time faled')
 
     def get_datetime(self):
         return self.clock.datetime
-
-    def ntptime(self):
-        response = self.request.get("http://worldclockapi.com/api/json/est/now")
-        if response.status_code == 200:
-            r = rtc.RTC()
-            r.datetime = time.localtime(response.json()['currentFileTime'])
-            print(f"System Time: {r.datetime}")
-            logger.info(f"System Time: {r.datetime}")
-        else:
-            print("Setting time failed")
-            logger.error('Setting time faled')
 
     def get_ip(self):
         return wifi.radio.ipv4_address
@@ -88,7 +76,16 @@ class Devices(object):
             return data
         except:
             return None
-
+    def get_forecast(self):
+        try:
+            logger.info('Gatting Forecast')
+            response = self.request.get("https://api.openweathermap.org/data/2.5/onecall?lat=50.40408&lon=30.66017&exclude=current,minutely,hourly&appid=e71be9fbe7496e8dc2127b9f08afd114&units=metric&lang=ua")
+            data = response.json()
+            logger.info('get request from openweathermap')
+            return data
+        except:
+            logger.error('Something wrong in getting forecast')
+            return None
     def update_weather(self):
         data = self.get_weather()
         if data != None:

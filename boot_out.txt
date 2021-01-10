@@ -1,1 +1,1 @@
-Adafruit CircuitPython 6.1.0-beta.3 on 2021-01-01; T8 with ESP32S2
+Adafruit CircuitPython 6.1.0-rc.0-11-g55c80754c on 2021-01-09; T8 with ESP32S2

@@ -1,4 +1,4 @@
-
+from utils import degrees_to_cardinal
 import gc
 import os
 import time
@@ -16,6 +16,9 @@ logger.setLevel(logging.INFO)
 time.sleep(3)
 # Devices
 dev = Devices()
+# UI
+theme = dark
+ui = UI(theme)
 #WiFi
 ssid = "Neurotoxin2"
 passwd = "Mxbb2Col"
@@ -29,29 +32,14 @@ o_temp = 0
 o_humi = 0
 o_press = 0
 o_alt = 0
-# UI
-theme = dark
-ui = UI(theme)
-ui.main_screen()
 collect()
 time.sleep(3)
-# contrs and intervals
+# counters and intervals
 try_count = 0
 weather_check_interval = 7200
 minute_counter = weather_check_interval
 graph_step = 100
 graph_counter = graph_step
-
-def degrees_to_cardinal(d):
-    '''
-    note: this is highly approximate...
-    '''
-    dirs = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",
-                "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"]
-    #dirs = ["Пн", "ПнПнСх", "ПнСх", "СхПнСх", "Сх", "СхПдСх", "ПдСх", "ПдПдСх",
-    #        "Пд", "ПдПдЗх", "ПдЗх", "ЗхПдЗх", "Зх", "ЗхПнЗх", "ПнЗх", "ПнПнЗх"]
-    ix = int((d + 11.25)/22.5)
-    return dirs[ix % 16]
 
 def set_weather(data):
     temperature, wind, weather = data['main'], data['wind'], data['weather']
@@ -72,8 +60,28 @@ def set_weather(data):
     ui.set_wind(wind_speed, wind_dir)
     ui.set_outside_humidity(humi)
     ui.set_we_desc(we_desc)
+
+def set_forecast(arg):
+    fc = arg['daily'][1]
+    dt = time.localtime(fc['dt'])
+    _date_ = "{:0>2}".format(dt[2]) + ".{:0>2}".format(dt[1]) + ".{:0>4}".format(dt[0])
+    temp = fc['temp']
+    day_temp, night_temp = temp['day'], temp['night']
+    feels_like = fc['feels_like']
+    feels_day, feels_night = feels_like['day'], feels_like['night']
+    humidity, pressure = fc['humidity'], fc['pressure'] * 0.75
+    press_and_humi = "J" + str(round(humidity)) + " F" + str(round(pressure))
+    wind_speed, wind_deg = fc['wind_speed'], fc['wind_deg']
+    wind = 'G' + str(round(wind_speed)) + " " + str(degrees_to_cardinal(wind_deg))
+    dn_temp = "d" + str(round(day_temp)) + "  n" + str(round(night_temp))
+    description = fc['weather'][0]['description']
+    ui.set_forecast_values(_date_, dn_temp, wind, press_and_humi, description)
+
+
+#set_forecast(dev.get_forecast())
 # Main Loop
 logger.info('Start main loop')
+ui.main_screen()
 while KeyboardInterrupt:
     ui.set_sys_stat("RAM:" + str(round(mem_free() / 1024 / 1024, 2)) + "Mb")
     ui.set_ip_stat('IP:' + str(dev.get_ip()))
@@ -82,7 +90,8 @@ while KeyboardInterrupt:
         #logger.info('get sensor data')
         if graph_counter == graph_step:
             ui.add_graphic_value(press)
-            logger.info('add to graphics ' + str(press))
+            logger.info('add to graph: ' + str(press))
+            ui.logit('update graph')
             graph_counter = 0
         else:
             graph_counter +=  1
@@ -92,21 +101,29 @@ while KeyboardInterrupt:
     except:
         pass
     if minute_counter == weather_check_interval:
+        ui.logit('getting current weather')
         data = dev.get_weather()
         if data != None:
             set_weather(data)
             logger.info('set current weather data')
+            ui.logit('display weather')
             minute_counter = 0
         else:
             minute_counter = weather_check_interval - 30
             try_count += 1
-#        if try_count == 5:
-#            pass
-#            #dev.reboot()
+        ui.logit('getting forecast')
+        forecast = dev.get_forecast()
+        if forecast != None:
+            ui.logit('display forecast')
+            set_forecast(forecast)
+            logger.info('set forecast')
+        else:
+            try_count += 1
     else:
         minute_counter += 1
     ui.set_progress((minute_counter / weather_check_interval))
-    ui.set_countdown(str(minute_counter))
+    #ui.set_countdown(str(minute_counter))
+    ui.logit('wait {} sec'.format(weather_check_interval - minute_counter))
     date_time = dev.get_datetime()
     ui.set_clock("{:0>2}".format(date_time[3] + 2) + ":{:0>2}".format(date_time[4]))
     collect()
