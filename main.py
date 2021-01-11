@@ -41,6 +41,7 @@ minute_counter = weather_check_interval
 graph_step = 100
 graph_counter = graph_step
 
+
 def set_weather(data):
     temperature, wind, weather = data['main'], data['wind'], data['weather']
     description= weather[0]
@@ -48,18 +49,16 @@ def set_weather(data):
     wind_dir = degrees_to_cardinal(wind_deg)
     temp, feels = round(raw_temp), round(raw_feels)
     if temp > 0:
-        ui.set_outside_temp("+" + str(round(temp)) + chr(0176))
+        t = "+" + str(round(temp)) + chr(0176)
     elif temp == 0:
-        ui.set_outside_temp(" " + str(round(temp)) + chr(0176))
+        t = " " + str(round(temp)) + chr(0176)
     else:
-        ui.set_outside_temp(str(round(temp)) + chr(0176))
+        t = str(round(temp)) + chr(0176)
     if feels > 0:
-        ui.set_feels("+" + str(round(feels)) + chr(0176))
+        f = "+" + str(round(feels)) + chr(0176)
     else:
-        ui.set_feels(str(round(feels)) + chr(0176))
-    ui.set_wind(wind_speed, wind_dir)
-    ui.set_outside_humidity(humi)
-    ui.set_we_desc(we_desc)
+        f = str(round(feels)) + chr(0176)
+    ui.set_weather_values(t, f, humi, wind_speed, wind_dir, we_desc)
 
 def set_forecast(arg):
     fc = arg['daily'][1]
@@ -70,12 +69,13 @@ def set_forecast(arg):
     feels_like = fc['feels_like']
     feels_day, feels_night = feels_like['day'], feels_like['night']
     humidity, pressure = fc['humidity'], fc['pressure'] * 0.75
-    press_and_humi = "J" + str(round(humidity)) + " F" + str(round(pressure))
+    humi = ui.HUMI_ICO + str(round(humidity))
+    press = ui.PRES_ICO + str(round(pressure))
     wind_speed, wind_deg = fc['wind_speed'], fc['wind_deg']
-    wind = 'G' + str(round(wind_speed)) + " " + str(degrees_to_cardinal(wind_deg))
-    dn_temp = "d" + str(round(day_temp)) + "  n" + str(round(night_temp))
+    wind = ui.WIND_ICO + str(round(wind_speed)) + " " + str(degrees_to_cardinal(wind_deg))
+    dn_temp = ui.DAYZ_ICO + str(round(day_temp)) + ui.NIGT_ICO + str(round(night_temp))
     description = fc['weather'][0]['description']
-    ui.set_forecast_values(_date_, dn_temp, wind, press_and_humi, description)
+    ui.set_forecast_values(_date_, dn_temp, wind, press, humi, description)
 
 
 #set_forecast(dev.get_forecast())
